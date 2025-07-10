@@ -16,14 +16,14 @@ cd ..
 sudo mkdir -p /mnt/efs
 
 # Mount EFS filesystem
-#echo "Mounting EFS filesystem ${efs_id}..."
-#sudo mount -t efs ${efs_id}:/ /mnt/efs
-
-# Set proper permissions for write access
-#sudo chown rocky:rocky /mnt/efs
-#sudo chmod 755 /mnt/efs
+echo "Mounting EFS filesystem ${efs_id}..."
+sudo mount -t efs ${efs_id}:/ /mnt/efs
 
 # Add to fstab for persistent mounting
-#echo "${efs_id}.efs.us-west-2.amazonaws.com:/ /mnt/efs efs defaults,_netdev 0 0" | sudo tee -a /etc/fstab
+echo "${efs_id}.efs.us-west-2.amazonaws.com:/ /mnt/efs efs defaults,_netdev 0 0" | sudo tee -a /etc/fstab
 
-#echo "[*] EFS utils installation and mounting completed"
+# Set proper permissions for write access
+sudo chown rocky:rocky /mnt/efs
+sudo chmod 755 /mnt/efs
+
+echo "[*] EFS utils installation and mounting completed"

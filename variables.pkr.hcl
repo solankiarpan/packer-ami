@@ -58,3 +58,16 @@ variable "security_group_id" {
   type        = string
   default     = null
 }
+
+# Okta ASA Configuration
+variable "okta_canonical_name" {
+  description = "Canonical name for Okta ASA server registration"
+  type        = string
+  default     = ""
+}
+
+variable "okta_team_name" {
+  description = "Okta team name for ASA configuration"
+  type        = string
+  default     = ""
+}

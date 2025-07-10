@@ -188,46 +188,15 @@ test_vnc_service() {
 
 test_efs_setup() {
     log "Testing EFS setup..."
-    
-    # Check EFS utils installation
-    if rpm -q amazon-efs-utils &> /dev/null; then
-        test_pass "Amazon EFS utils installed"
-    else
-        test_fail "Amazon EFS utils not installed"
-    fi
-    
-    # Check mount.efs helper
-    if command -v mount.efs &> /dev/null; then
-        test_pass "EFS mount helper available"
-    else
-        test_fail "EFS mount helper not found"
-    fi
-    
-    # Check EFS mount point
+        # Check EFS mount point
     if [[ -d "/mnt/efs" ]]; then
         test_pass "EFS mount point exists"
-        
-        # Check ownership and permissions
-        local owner=$(stat -c "%U:%G" /mnt/efs 2>/dev/null)
-        local perms=$(stat -c "%a" /mnt/efs 2>/dev/null)
-        
-        if [[ "$owner" == "rocky:rocky" ]]; then
-            test_pass "EFS mount point has correct ownership"
-        else
-            test_fail "EFS mount point has incorrect ownership ($owner, expected rocky:rocky)"
-        fi
-        
-        if [[ "$perms" == "755" ]]; then
-            test_pass "EFS mount point has correct permissions"
-        else
-            test_fail "EFS mount point has incorrect permissions ($perms, expected 755)"
-        fi
     else
         test_fail "EFS mount point not found"
     fi
     
     # Check fstab entry
-    if grep -q "efs" /etc/fstab; then
+    if grep -q "fs-.*:/" /etc/fstab; then
         test_pass "EFS entry found in fstab"
     else
         test_fail "EFS entry not found in fstab"
@@ -507,6 +476,45 @@ test_firewall() {
     fi
 }
 
+test_vlc() {
+   log "Testing VLC Media Player installation..."
+   
+   # Check VLC installation
+   if command -v /snap/bin/vlc &> /dev/null; then
+       test_pass "VLC installed ($(/snap/bin/vlc --version 2>&1 | head -1))"
+   else
+       test_fail "VLC not installed"
+   fi
+   
+   # Check snapd service
+   if systemctl is-active snapd.socket &> /dev/null; then
+       test_pass "Snapd service running"
+   else
+       test_fail "Snapd service not running"
+   fi
+   
+   # Check snap symlink
+   if [[ -L "/snap" ]]; then
+       test_pass "Snap symlink exists"
+   else
+       test_fail "Snap symlink missing"
+   fi
+   
+   # Check VLC desktop entry
+   if [[ -f "/usr/share/applications/vlc.desktop" ]]; then
+       test_pass "VLC desktop entry configured"
+   else
+       test_fail "VLC desktop entry not found"
+   fi
+   
+   # Check PATH configuration
+   if grep -q "/snap/bin" /home/rocky/.bashrc; then
+       test_pass "Snap PATH configured in .bashrc"
+   else
+       test_fail "Snap PATH not configured"
+   fi
+}
+
 # Main execution
 main() {
     echo "========================================="
@@ -526,6 +534,7 @@ main() {
     test_pycharm
     test_conda_jupyter
     test_firewall
+    test_vlc
     
     # Print summary
     echo

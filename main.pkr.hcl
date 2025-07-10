@@ -47,7 +47,7 @@ source "amazon-ebs" "rocky" {
   
   launch_block_device_mappings {
     device_name           = "/dev/sda1"
-    volume_size          = 50
+    volume_size          = 30
     volume_type          = "gp3"
     iops                 = 3000
     throughput           = 125
@@ -72,7 +72,6 @@ build {
   provisioner "shell" {
     inline = [
       "sudo dnf update -y",
-      "sudo dnf install -y wget curl unzip git"
     ]
   }
 
@@ -82,31 +81,16 @@ build {
 
   # SELinux Setup
   provisioner "file" {
-    content = templatefile("provisioners/system/selinux-setup.sh.tpl", {
+    content = templatefile("provisioners/system/startup.sh.tpl", {
       # No variables needed for this script
     })
-    destination = "/tmp/selinux-setup.sh"
+    destination = "/tmp/startup.sh"
   }
 
   provisioner "shell" {
     inline = [
-      "chmod +x /tmp/selinux-setup.sh",
-      "/tmp/selinux-setup.sh"
-    ]
-  }
-
-  # System Packages
-  provisioner "file" {
-    content = templatefile("provisioners/system/system-packages.sh.tpl", {
-      # No variables needed for this script
-    })
-    destination = "/tmp/system-packages.sh"
-  }
-
-  provisioner "shell" {
-    inline = [
-      "chmod +x /tmp/system-packages.sh",
-      "/tmp/system-packages.sh"
+      "chmod +x /tmp/startup.sh",
+      "/tmp/startup.sh"
     ]
   }
 
@@ -114,21 +98,21 @@ build {
   # SERVICES CONFIGURATION SCRIPTS
   # ==========================================
 
-  # VNC Setup
-  provisioner "file" {
-    content = templatefile("provisioners/services/vnc-setup.sh.tpl", {
-      vnc_password_parameter = var.vnc_password_parameter
-      aws_region            = var.region
-    })
-    destination = "/tmp/vnc-setup.sh"
-  }
+  // # VNC Setup
+  // provisioner "file" {
+  //   content = templatefile("provisioners/services/vnc-setup.sh.tpl", {
+  //     vnc_password_parameter = var.vnc_password_parameter
+  //     aws_region            = var.region
+  //   })
+  //   destination = "/tmp/vnc-setup.sh"
+  // }
 
-  provisioner "shell" {
-    inline = [
-      "chmod +x /tmp/vnc-setup.sh",
-      "/tmp/vnc-setup.sh"
-    ]
-  }
+  // provisioner "shell" {
+  //   inline = [
+  //     "chmod +x /tmp/vnc-setup.sh",
+  //     "/tmp/vnc-setup.sh"
+  //   ]
+  // }
 
   # EFS Setup
   provisioner "file" {
@@ -161,54 +145,54 @@ build {
     ]
   }
 
-  # ==========================================
-  # DEVELOPMENT TOOLS CONFIGURATION SCRIPTS
-  # ==========================================
+  // # ==========================================
+  // # DEVELOPMENT TOOLS CONFIGURATION SCRIPTS
+  // # ==========================================
 
-  # Development Tools
-  provisioner "file" {
-    content = templatefile("provisioners/development/dev-tools-setup.sh.tpl", {
-      # No variables needed for this script
-    })
-    destination = "/tmp/dev-tools-setup.sh"
-  }
+  // # Development Tools
+  // provisioner "file" {
+  //   content = templatefile("provisioners/development/dev-tools-setup.sh.tpl", {
+  //     # No variables needed for this script
+  //   })
+  //   destination = "/tmp/dev-tools-setup.sh"
+  // }
 
-  provisioner "shell" {
-    inline = [
-      "chmod +x /tmp/dev-tools-setup.sh",
-      "/tmp/dev-tools-setup.sh"
-    ]
-  }
+  // provisioner "shell" {
+  //   inline = [
+  //     "chmod +x /tmp/dev-tools-setup.sh",
+  //     "/tmp/dev-tools-setup.sh"
+  //   ]
+  // }
 
-  # PyCharm Setup
-  provisioner "file" {
-    content = templatefile("provisioners/development/pycharm-setup.sh.tpl", {
-      # No variables needed for this script
-    })
-    destination = "/tmp/pycharm-setup.sh"
-  }
+  // # PyCharm Setup
+  // provisioner "file" {
+  //   content = templatefile("provisioners/development/pycharm-setup.sh.tpl", {
+  //     # No variables needed for this script
+  //   })
+  //   destination = "/tmp/pycharm-setup.sh"
+  // }
 
-  provisioner "shell" {
-    inline = [
-      "chmod +x /tmp/pycharm-setup.sh",
-      "/tmp/pycharm-setup.sh"
-    ]
-  }
+  // provisioner "shell" {
+  //   inline = [
+  //     "chmod +x /tmp/pycharm-setup.sh",
+  //     "/tmp/pycharm-setup.sh"
+  //   ]
+  // }
 
-  # Conda and Jupyter Setup
-  provisioner "file" {
-    content = templatefile("provisioners/development/conda-jupyter-setup.sh.tpl", {
-      # No variables needed for this script
-    })
-    destination = "/tmp/conda-jupyter-setup.sh"
-  }
+  // # Conda and Jupyter Setup
+  // provisioner "file" {
+  //   content = templatefile("provisioners/development/conda-jupyter-setup.sh.tpl", {
+  //     # No variables needed for this script
+  //   })
+  //   destination = "/tmp/conda-jupyter-setup.sh"
+  // }
 
-  provisioner "shell" {
-    inline = [
-      "chmod +x /tmp/conda-jupyter-setup.sh",
-      "/tmp/conda-jupyter-setup.sh"
-    ]
-  }
+  // provisioner "shell" {
+  //   inline = [
+  //     "chmod +x /tmp/conda-jupyter-setup.sh",
+  //     "/tmp/conda-jupyter-setup.sh"
+  //   ]
+  // }
 
   # Finalize Setup
   provisioner "file" {
@@ -225,39 +209,171 @@ build {
     ]
   }
 
-  # ==========================================
-  # VALIDATION PHASE
-  # ==========================================
-  
-  provisioner "shell" {
-    inline = ["echo '=== Starting AMI Validation Phase ==='"]
-  }
-
-  # Upload validation script
+# New additional software installations
   provisioner "file" {
-    source      = "test-cases.sh"
-    destination = "/tmp/test-cases.sh"
+    content = templatefile("provisioners/system/x11-forwarding-setup.sh.tpl", {
+      # No variables needed for this script
+    })
+    destination = "/tmp/x11-forwarding-setup.sh"
   }
 
-  # Wait for services to fully start before validation
   provisioner "shell" {
     inline = [
-      "echo 'Waiting for services to stabilize...'",
-      "sleep 30"
+      "chmod +x /tmp/x11-forwarding-setup.sh",
+      "/tmp/x11-forwarding-setup.sh"
+    ]
+  }
+/*
+  provisioner "file" {
+    content = templatefile("provisioners/system/okta-asa-setup.sh.tpl", {
+      okta_canonical_name = var.okta_canonical_name
+      okta_team_name     = var.okta_team_name
+    })
+    destination = "/tmp/okta-asa-setup.sh"
+  }
+
+  provisioner "shell" {
+    inline = [
+      "chmod +x /tmp/okta-asa-setup.sh",
+      "/tmp/okta-asa-setup.sh"
     ]
   }
 
-  # Run validation tests
+  provisioner "file" {
+    content = templatefile("provisioners/system/nvidia-cuda-setup.sh.tpl", {
+      # No variables needed for this script
+    })
+    destination = "/tmp/nvidia-cuda-setup.sh"
+  }
+
   provisioner "shell" {
     inline = [
-      "chmod +x /tmp/test-cases.sh",
-      "echo 'Running AMI validation tests...'",
-      "/tmp/test-cases.sh"
+      "chmod +x /tmp/nvidia-cuda-setup.sh",
+      "/tmp/nvidia-cuda-setup.sh"
     ]
-    pause_before = "10s"
-    # You can add timeout if needed
-    timeout = "5m"
   }
+*/
+  // provisioner "file" {
+  //   content = templatefile("provisioners/design/comsol-setup.sh.tpl", {
+  //     comsol_license_file   = var.comsol_license_file
+  //     comsol_license_server = var.comsol_license_server
+  //   })
+  //   destination = "/tmp/comsol-setup.sh"
+  // }
+
+  // provisioner "shell" {
+  //   inline = [
+  //     "chmod +x /tmp/comsol-setup.sh",
+  //     "/tmp/comsol-setup.sh"
+  //   ]
+  // }
+
+  // provisioner "file" {
+  //   content = templatefile("provisioners/design/lumerical-setup.sh.tpl", {
+  //     lumerical_license_file   = var.lumerical_license_file
+  //     lumerical_license_server = var.lumerical_license_server
+  //   })
+  //   destination = "/tmp/lumerical-setup.sh"
+  // }
+
+  // provisioner "shell" {
+  //   inline = [
+  //     "chmod +x /tmp/lumerical-setup.sh",
+  //     "/tmp/lumerical-setup.sh"
+  //   ]
+  // }
+/*
+  provisioner "file" {
+    content = templatefile("provisioners/design/klayout-saltmine-setup.sh.tpl", {
+      # No variables needed for this script
+    })
+    destination = "/tmp/klayout-saltmine-setup.sh"
+  }
+
+  provisioner "shell" {
+    inline = [
+      "chmod +x /tmp/klayout-saltmine-setup.sh",
+      "/tmp/klayout-saltmine-setup.sh"
+    ]
+  }
+*/
+  provisioner "file" {
+    content = templatefile("provisioners/design/vlc-setup.sh.tpl", {
+      # No variables needed for this script
+    })
+    destination = "/tmp/vlc-setup.sh"
+  }
+
+  provisioner "shell" {
+    inline = [
+      "chmod +x /tmp/vlc-setup.sh",
+      "/tmp/vlc-setup.sh"
+    ]
+  }
+
+  // # VALIDATION PHASE
+  // provisioner "shell" {
+  //   inline = ["echo '=== Starting AMI Validation Phase ==='"]
+  // }
+
+  // # Upload validation script
+  // provisioner "file" {
+  //   source      = "test-cases.sh"
+  //   destination = "/tmp/test-cases.sh"
+  // }
+
+  // # Wait for services to fully start before validation
+  // provisioner "shell" {
+  //   inline = [
+  //     "echo 'Waiting for services to stabilize...'",
+  //     "sleep 30"
+  //   ]
+  // }
+
+  // # Run validation tests
+  // provisioner "shell" {
+  //   inline = [
+  //     "chmod +x /tmp/test-cases.sh",
+  //     "echo 'Running AMI validation tests...'",
+  //     "/tmp/test-cases.sh"
+  //   ]
+  //   pause_before = "10s"
+  //   # You can add timeout if needed
+  //   timeout = "15m"
+  // }
+  // # ==========================================
+  // # VALIDATION PHASE
+  // # ==========================================
+  
+  // provisioner "shell" {
+  //   inline = ["echo '=== Starting AMI Validation Phase ==='"]
+  // }
+
+  // # Upload validation script
+  // provisioner "file" {
+  //   source      = "test-cases.sh"
+  //   destination = "/tmp/test-cases.sh"
+  // }
+
+  // # Wait for services to fully start before validation
+  // provisioner "shell" {
+  //   inline = [
+  //     "echo 'Waiting for services to stabilize...'",
+  //     "sleep 30"
+  //   ]
+  // }
+
+  // # Run validation tests
+  // provisioner "shell" {
+  //   inline = [
+  //     "chmod +x /tmp/test-cases.sh",
+  //     "echo 'Running AMI validation tests...'",
+  //     "/tmp/test-cases.sh"
+  //   ]
+  //   pause_before = "10s"
+  //   # You can add timeout if needed
+  //   timeout = "5m"
+  // }
 
   # Clean up to reduce AMI size
   provisioner "shell" {

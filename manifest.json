@@ -23,7 +23,31 @@
         "ami_tested": "true",
         "validation_date": "2025-06-16T12:05:40Z"
       }
+    },
+    {
+      "name": "rocky",
+      "builder_type": "amazon-ebs",
+      "build_time": 1750835669,
+      "files": null,
+      "artifact_id": "us-west-2:ami-0f565dedbb4bbfd23",
+      "packer_run_uuid": "e134128a-6696-e423-5824-674d80496304",
+      "custom_data": {
+        "ami_tested": "true",
+        "validation_date": "2025-06-25T07:14:29Z"
+      }
+    },
+    {
+      "name": "rocky",
+      "builder_type": "amazon-ebs",
+      "build_time": 1752069250,
+      "files": null,
+      "artifact_id": "us-west-2:ami-066c8c4699f1f1bfc",
+      "packer_run_uuid": "93c38294-74cb-49a4-acb9-186fe4fc0d68",
+      "custom_data": {
+        "ami_tested": "true",
+        "validation_date": "2025-07-09T13:54:10Z"
+      }
     }
   ],
-  "last_run_uuid": "b0047163-bfbb-5fb6-3243-87e84ca35812"
+  "last_run_uuid": "93c38294-74cb-49a4-acb9-186fe4fc0d68"
 }

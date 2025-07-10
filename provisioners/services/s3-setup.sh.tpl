@@ -30,6 +30,8 @@ echo "[*] IAM role verification successful"
 
 # Create mount points
 sudo mkdir -p /mnt/s3
+sudo chown rocky:rocky /mnt/s3
+sudo chmod 755 /mnt/s3
 
 # Mount S3 bucket using IAM role (no credentials file needed)
 echo "Mounting S3 bucket using IAM role..."

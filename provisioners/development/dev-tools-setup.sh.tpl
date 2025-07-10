@@ -1,6 +1,5 @@
 #!/bin/bash
 set -e
-
 echo "[*] Installing VS Code"
 # Add Microsoft's GPG key and repository
 sudo rpm --import https://packages.microsoft.com/keys/microsoft.asc

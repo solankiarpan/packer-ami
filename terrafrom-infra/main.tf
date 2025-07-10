@@ -1,7 +1,7 @@
 # S3 Module
 module "s3" {
   source = "./modules/s3"
-  s3_bucket_name = "cloudburfi-packer-rocky-ami-bucket"
+  s3_bucket_name = "packer-rocky-ami-bucket-cloudburfi"
 }
 
 # EFS Module

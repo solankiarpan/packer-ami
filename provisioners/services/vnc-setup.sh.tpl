@@ -2,7 +2,8 @@
 set -e
 
 echo "[*] VNC setup"
-
+sudo dnf groupinstall -y "Server with GUI"
+sudo dnf install -y tigervnc-server
 # Install AWS CLI if not already installed
 sudo dnf install -y awscli
 

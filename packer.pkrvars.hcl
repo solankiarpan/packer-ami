@@ -8,13 +8,17 @@ ami_name = "rocky-linux-dev-{{timestamp}}"
 instance_profile_name = "packer-rocky-ami-profile"
 
 # EFS File System ID (from Terraform output)
-efs_id = "fs-06a2c6cbd359b4095"
+efs_id = "fs-0328ffdf76ef2d4f1"
 
 # S3 Bucket Name (from Terraform output)
-s3_bucket = "cloudburfi-packer-rocky-ami-bucket"
+s3_bucket = "packer-rocky-ami-bucket-cloudburfi"
 
 # SSM Parameter for VNC Password
 vnc_password_parameter = "/packer/vnc-password"
+
+# Okta ASA Configuration (optional)
+okta_canonical_name = "rocky-dev-server"
+okta_team_name     = "okta-team"
 
 # Optional: VPC Configuration (uncomment if needed)
 # vpc_id = "vpc-0123456789abcdef0"
